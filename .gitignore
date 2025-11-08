@@ -1,0 +1,51 @@
+# Dependencies
+node_modules/
+vendor/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Build outputs
+dist/
+build/
+*.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+*.pid
+*.seed
+*.log
+
+# Laravel
+/laravel_app/storage/*.key
+/laravel_app/storage/framework/cache/*
+/laravel_app/storage/framework/sessions/*
+/laravel_app/storage/framework/views/*
+/laravel_app/storage/logs/*
+/laravel_app/bootstrap/cache/*
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+.pytest_cache/
+.coverage
+
+# Database
+*.sqlite
+*.db
+postgres_data/
