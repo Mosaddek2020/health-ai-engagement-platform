@@ -52,7 +52,6 @@ class AIAgentService
             $data = $response->json();
             
             Log::info('AI Agent prediction', [
-                'patient_id' => $patientData['patient_id'] ?? 'unknown',
                 'risk_score' => $data['risk_score'],
                 'risk_level' => $data['risk_level']
             ]);
@@ -61,8 +60,7 @@ class AIAgentService
             
         } catch (\Exception $e) {
             Log::error('AI Agent service error', [
-                'message' => $e->getMessage(),
-                'patient_data' => $patientData
+                'message' => $e->getMessage()
             ]);
             throw $e;
         }

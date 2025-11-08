@@ -103,7 +103,7 @@ async def predict_risk(patient_data: PatientData):
         else:
             risk_level = "high"
         
-        logger.info(f"Prediction made for patient {patient_data.patient_id}: {risk_probability:.2f}")
+        logger.info(f"Prediction made: risk_probability={risk_probability:.2f}, risk_level={risk_level}")
         
         return RiskPrediction(
             risk_score=round(risk_probability, 4),
