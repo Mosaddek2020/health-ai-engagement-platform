@@ -1,13 +1,23 @@
 # health-ai-engagement-platform
 AI-powered platform to predict and reduce patient no-shows. Features smart triage, automated intake, and engagement workflows for healthcare providers using EHRs like Epic.
 
+## 🚀 Current Version: V1.3
+
+### ✨ Latest Features
+- **V1.2**: Real-time WebSocket updates via Laravel Reverb (no more polling!)
+- **V1.3**: Interactive manual controls - Confirm/Skip appointments directly from dashboard
+- **V1.1**: Live dashboard with AI-powered risk predictions
+
+See [QUICK_START_V1.2_V1.3.md](./QUICK_START_V1.2_V1.3.md) for new features guide.
+
 ## Architecture
 
 This platform uses a microservices architecture with the following components:
 
 - **Laravel Backend**: PHP-based API and backend logic
+- **Laravel Reverb**: WebSocket server for real-time updates
 - **PostgreSQL Database**: Persistent data storage
-- **React Frontend (Vite)**: Modern frontend application
+- **React Frontend (Vite)**: Modern frontend application with real-time sync
 - **AI Agent Service**: Python FastAPI microservice for ML predictions
 
 ## Services
@@ -23,20 +33,26 @@ This platform uses a microservices architecture with the following components:
 - **Port**: Internal (via nginx)
 - **Purpose**: Main backend API and business logic
 
-### 3. PostgreSQL Database
+### 3. Laravel Reverb (NEW in V1.2)
+- **Technology**: Laravel Reverb WebSocket Server
+- **Port**: 8080
+- **Endpoint**: `ws://localhost:8080`
+- **Purpose**: Real-time broadcasting for instant dashboard updates
+
+### 4. PostgreSQL Database
 - **Technology**: PostgreSQL 15
 - **Port**: 5432
 - **Database**: health_ai_db
 
-### 4. Nginx Web Server
+### 5. Nginx Web Server
 - **Technology**: Nginx Alpine
 - **Port**: 80
 - **Purpose**: Serves Laravel application
 
-### 5. React Frontend
-- **Technology**: React 18, Vite
+### 6. React Frontend
+- **Technology**: React 18, Vite, Laravel Echo
 - **Port**: 5173
-- **Purpose**: User interface
+- **Purpose**: User interface with real-time WebSocket connections
 
 ## Getting Started
 
@@ -188,9 +204,63 @@ DB_DATABASE=health_ai_db
 DB_USERNAME=health_ai_user
 DB_PASSWORD=health_ai_pass
 AI_AGENT_URL=http://ai-agent:8000
+
+# Reverb WebSocket Configuration (V1.2)
+BROADCAST_CONNECTION=reverb
+REVERB_APP_ID=296025
+REVERB_APP_KEY=8hlc5bhzgdhjhjwvol15
+REVERB_APP_SECRET=xqe78njrewxbsv59dug6
+REVERB_HOST="localhost"
+REVERB_PORT=8080
+REVERB_SCHEME=http
 ```
 
+## Dashboard Features
+
+### V1.3 - Current Version
+- **Real-time Updates**: WebSocket connections eliminate polling delays
+- **Manual Controls**: Confirm or skip high-risk appointments with one click
+- **Multi-user Sync**: All connected dashboards update instantly
+- **AI Processing**: Click to analyze all appointments and calculate risk scores
+- **Action Queue**: Prioritized list of high-risk patients (>70% no-show risk)
+- **KPI Cards**: Live statistics - Total, Confirmed, Pending, High-risk counts
+- **Toast Notifications**: Real-time feedback for all actions
+
+### API Endpoints
+```
+GET  /api/kpi-stats                    - Dashboard statistics
+GET  /api/appointments                 - All appointments
+GET  /api/action-queue                 - High-risk appointments (>70%)
+GET  /api/action-log                   - Recent processing history
+POST /api/process-appointments         - Run AI analysis
+POST /api/reset-appointments           - Reset all to initial state
+POST /api/appointments/{id}/confirm    - Manually confirm appointment
+POST /api/appointments/{id}/skip       - Skip/remove from queue
+```
+
+### WebSocket Events
+The dashboard listens to the `appointments` channel and receives instant updates for:
+- AI processing complete
+- Appointments reset
+- Manual confirmation
+- Manual skip
+
 ## Troubleshooting
+
+### WebSocket Connection Issues
+```bash
+# Check Reverb is running
+docker compose ps reverb
+
+# Check Reverb logs
+docker compose logs reverb
+
+# Restart Reverb
+docker compose restart reverb
+
+# Verify port 8080 is available
+netstat -an | grep 8080
+```
 
 ### Services not starting
 ```bash

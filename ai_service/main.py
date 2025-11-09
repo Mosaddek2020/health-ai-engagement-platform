@@ -4,6 +4,7 @@ from typing import Optional
 import numpy as np
 from sklearn.ensemble import RandomForestClassifier
 import logging
+import random
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -130,3 +131,20 @@ async def model_info():
         ],
         "trained": True
     }
+
+
+@app.post("/predict/no-show")
+async def predict_no_show():
+    """
+    MVP endpoint: Returns a mock no-show risk score
+    This is a simplified endpoint for the MVP phase.
+    In V2, this will run a real model with patient data.
+    
+    Returns:
+        dict: Contains no_show_risk (0.1-0.95)
+    """
+    # For MVP, return a random risk score
+    mock_risk = round(random.uniform(0.1, 0.95), 2)
+    logger.info(f"Mock prediction generated: no_show_risk={mock_risk}")
+    return {"no_show_risk": mock_risk}
+

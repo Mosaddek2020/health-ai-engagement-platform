@@ -60,6 +60,33 @@ services:
       DB_USERNAME: health_ai_user
       DB_PASSWORD: health_ai_pass
       AI_AGENT_URL: http://ai-agent:8000
+      REVERB_SERVER_HOST: 0.0.0.0
+      REVERB_SERVER_PORT: 8080
+    restart: unless-stopped
+
+  # Laravel Reverb WebSocket Server
+  reverb:
+    build:
+      context: ./laravel_app
+      dockerfile: Dockerfile
+    container_name: health-ai-reverb
+    command: php artisan reverb:start --host=0.0.0.0 --port=8080
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./laravel_app:/var/www/html
+    networks:
+      - health-ai-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DB_CONNECTION: pgsql
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_DATABASE: health_ai_db
+      DB_USERNAME: health_ai_user
+      DB_PASSWORD: health_ai_pass
     restart: unless-stopped
 
   # Nginx Web Server for Laravel

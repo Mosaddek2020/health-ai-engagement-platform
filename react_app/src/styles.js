@@ -1,0 +1,86 @@
+export const styles = {
+  container: {
+    minHeight: '100vh',
+    backgroundColor: '#f3f4f6',
+  },
+  header: {
+    backgroundColor: 'white',
+    boxShadow: '0 1px 3px 0 rgb(0 0 0 / 0.1)',
+  },
+  headerInner: {
+    maxWidth: '1280px',
+    margin: '0 auto',
+    padding: '24px 32px',
+  },
+  title: {
+    fontSize: '30px',
+    fontWeight: 'bold',
+    color: '#111827',
+    marginBottom: '4px',
+  },
+  subtitle: {
+    fontSize: '14px',
+    color: '#6b7280',
+  },
+  main: {
+    maxWidth: '1280px',
+    margin: '0 auto',
+    padding: '32px',
+  },
+  card: {
+    backgroundColor: 'white',
+    borderRadius: '8px',
+    boxShadow: '0 1px 3px 0 rgb(0 0 0 / 0.1)',
+    padding: '24px',
+    marginBottom: '24px',
+  },
+  table: {
+    width: '100%',
+    borderCollapse: 'collapse',
+  },
+  th: {
+    backgroundColor: '#f9fafb',
+    padding: '12px 24px',
+    textAlign: 'left',
+    fontSize: '12px',
+    fontWeight: '500',
+    color: '#6b7280',
+    textTransform: 'uppercase',
+    letterSpacing: '0.05em',
+    borderBottom: '1px solid #e5e7eb',
+  },
+  td: {
+    padding: '16px 24px',
+    fontSize: '14px',
+    borderBottom: '1px solid #e5e7eb',
+  },
+  badge: {
+    display: 'inline-block',
+    padding: '4px 12px',
+    fontSize: '12px',
+    fontWeight: '600',
+    borderRadius: '9999px',
+  },
+  button: {
+    width: '100%',
+    padding: '8px 16px',
+    backgroundColor: '#dc2626',
+    color: 'white',
+    border: 'none',
+    borderRadius: '6px',
+    fontWeight: '500',
+    cursor: 'pointer',
+  },
+  grid2: {
+    display: 'grid',
+    gridTemplateColumns: '1fr 1fr',
+    gap: '24px',
+    marginTop: '24px',
+  },
+  grid4: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(4, 1fr)',
+    gap: '24px',
+    marginBottom: '32px',
+  },
+};
