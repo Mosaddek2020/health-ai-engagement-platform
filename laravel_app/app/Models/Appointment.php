@@ -29,6 +29,7 @@ class Appointment extends Model
     protected $casts = [
         'appointment_time' => 'datetime',
         'no_show_risk' => 'decimal:2',
+        'risk_reasons' => 'array',
     ];
 }
 

@@ -156,7 +156,8 @@ class DashboardController extends Controller
         try {
             $updated = Appointment::query()->update([
                 'status' => 'Scheduled',
-                'no_show_risk' => null
+                'no_show_risk' => null,
+                'risk_reasons' => null
             ]);
             
             // Broadcast the update

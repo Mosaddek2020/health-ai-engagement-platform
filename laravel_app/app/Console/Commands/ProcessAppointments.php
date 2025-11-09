@@ -51,9 +51,11 @@ class ProcessAppointments extends Command
                 
                 if ($response->successful()) {
                     $riskScore = $response->json('no_show_risk');
+                    $riskReasons = $response->json('risk_reasons', []);
                     
                     // Update the appointment
                     $appointment->no_show_risk = $riskScore;
+                    $appointment->risk_reasons = $riskReasons;
                     $appointment->status = 'Confirmation Sent';
                     $appointment->save();
                     
@@ -61,10 +63,11 @@ class ProcessAppointments extends Command
                     Log::info("Processed appointment {$appointment->id}", [
                         'patient_name' => $appointment->patient_name,
                         'risk_score' => $riskScore,
+                        'reasons_count' => count($riskReasons),
                         'appointment_time' => $appointment->appointment_time
                     ]);
                     
-                    $this->line("✓ Processed appointment #{$appointment->id} - Risk: {$riskScore}");
+                    $this->line("✓ Processed appointment #{$appointment->id} - Risk: {$riskScore} (" . count($riskReasons) . " reasons)");
                     $processedCount++;
                 } else {
                     throw new \Exception("AI Agent returned status: {$response->status()}");

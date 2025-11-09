@@ -17,6 +17,8 @@ function Dashboard() {
   const [resetting, setResetting] = useState(false);
   const [processMessage, setProcessMessage] = useState('');
   const [showConfetti, setShowConfetti] = useState(false);
+  const [expandedReason, setExpandedReason] = useState(null); // Track which appointment's reasons are shown (table)
+  const [expandedActionQueueReason, setExpandedActionQueueReason] = useState(null); // Track which action queue item's reasons are shown
   const queryClientInstance = useQueryClient();
 
   // Play notification sound
@@ -418,8 +420,61 @@ function Dashboard() {
                     </td>
                     <td style={{ padding: '16px 20px', fontSize: '14px', color: '#6b7280' }}>{apt.appointment_type}</td>
                     <td style={{ padding: '16px 20px', fontSize: '14px', color: '#6b7280' }}>{apt.provider_name}</td>
-                    <td style={{ padding: '16px 20px', fontSize: '14px', fontWeight: 'bold', color: getRiskColor(apt.no_show_risk) }}>
-                      {apt.no_show_risk ? `${(apt.no_show_risk * 100).toFixed(0)}%` : '—'}
+                    <td style={{ padding: '16px 20px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <span style={{ fontSize: '14px', fontWeight: 'bold', color: getRiskColor(apt.no_show_risk) }}>
+                          {apt.no_show_risk ? `${(apt.no_show_risk * 100).toFixed(0)}%` : '—'}
+                        </span>
+                        {apt.risk_reasons && apt.risk_reasons.length > 0 && (
+                          <button
+                            onClick={() => setExpandedReason(expandedReason === apt.id ? null : apt.id)}
+                            style={{
+                              backgroundColor: '#3b82f6',
+                              color: 'white',
+                              border: 'none',
+                              borderRadius: '4px',
+                              padding: '4px 8px',
+                              fontSize: '11px',
+                              cursor: 'pointer',
+                              fontWeight: '600',
+                              transition: 'all 0.2s'
+                            }}
+                            onMouseOver={(e) => {
+                              e.target.style.backgroundColor = '#2563eb';
+                            }}
+                            onMouseOut={(e) => {
+                              e.target.style.backgroundColor = '#3b82f6';
+                            }}
+                          >
+                            {expandedReason === apt.id ? 'Hide' : 'Why?'}
+                          </button>
+                        )}
+                      </div>
+                      {expandedReason === apt.id && apt.risk_reasons && (
+                        <div style={{
+                          marginTop: '8px',
+                          padding: '12px',
+                          backgroundColor: '#fef3c7',
+                          borderLeft: '3px solid #f59e0b',
+                          borderRadius: '4px',
+                          fontSize: '12px'
+                        }}>
+                          <div style={{ fontWeight: 'bold', marginBottom: '8px', color: '#92400e' }}>
+                            🧠 AI Reasoning:
+                          </div>
+                          {apt.risk_reasons.map((reason, idx) => (
+                            <div key={idx} style={{ marginBottom: '6px', display: 'flex', gap: '6px', alignItems: 'flex-start' }}>
+                              <span>{reason.icon}</span>
+                              <div>
+                                <div style={{ color: '#78350f', fontWeight: '500' }}>{reason.reason}</div>
+                                <div style={{ color: '#92400e', fontSize: '11px', marginTop: '2px', fontStyle: 'italic' }}>
+                                  💡 {reason.action}
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </td>
                     <td style={{ padding: '16px 20px' }}>
                       <span style={getStatusStyle(apt.status)}>{apt.status}</span>
@@ -490,6 +545,77 @@ function Dashboard() {
                     <div><strong>Time:</strong> {new Date(apt.appointment_time).toLocaleString()}</div>
                     <div><strong>Type:</strong> {apt.appointment_type}</div>
                   </div>
+                  
+                  {/* Risk Reasons - Collapsible in Action Queue */}
+                  {apt.risk_reasons && apt.risk_reasons.length > 0 && (
+                    <div style={{ marginBottom: '12px' }}>
+                      <button
+                        onClick={() => setExpandedActionQueueReason(expandedActionQueueReason === apt.id ? null : apt.id)}
+                        style={{
+                          width: '100%',
+                          padding: '10px 12px',
+                          backgroundColor: expandedActionQueueReason === apt.id ? '#fff7ed' : '#fef3c7',
+                          border: '2px solid #f59e0b',
+                          borderRadius: '6px',
+                          cursor: 'pointer',
+                          fontWeight: '600',
+                          fontSize: '13px',
+                          color: '#92400e',
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          transition: 'all 0.2s ease'
+                        }}
+                        onMouseOver={(e) => {
+                          e.target.style.backgroundColor = '#fff7ed';
+                        }}
+                        onMouseOut={(e) => {
+                          e.target.style.backgroundColor = expandedActionQueueReason === apt.id ? '#fff7ed' : '#fef3c7';
+                        }}
+                      >
+                        <span>🧠 Why is this patient high-risk?</span>
+                        <span style={{ fontSize: '18px', transition: 'transform 0.2s', transform: expandedActionQueueReason === apt.id ? 'rotate(180deg)' : 'rotate(0deg)' }}>
+                          ▼
+                        </span>
+                      </button>
+                      
+                      {expandedActionQueueReason === apt.id && (
+                        <div style={{
+                          marginTop: '8px',
+                          padding: '12px',
+                          backgroundColor: '#fff7ed',
+                          borderLeft: '4px solid #f59e0b',
+                          borderRadius: '6px',
+                          animation: 'slideInRight 0.2s ease-out'
+                        }}>
+                          {apt.risk_reasons.map((reason, idx) => (
+                            <div key={idx} style={{ 
+                              marginBottom: idx < apt.risk_reasons.length - 1 ? '8px' : '0',
+                              paddingBottom: idx < apt.risk_reasons.length - 1 ? '8px' : '0',
+                              borderBottom: idx < apt.risk_reasons.length - 1 ? '1px solid #fed7aa' : 'none'
+                            }}>
+                              <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-start', marginBottom: '4px' }}>
+                                <span style={{ fontSize: '16px' }}>{reason.icon}</span>
+                                <span style={{ color: '#78350f', fontWeight: '600', fontSize: '13px' }}>{reason.reason}</span>
+                              </div>
+                              <div style={{ 
+                                marginLeft: '24px',
+                                color: '#92400e', 
+                                fontSize: '12px', 
+                                fontStyle: 'italic',
+                                display: 'flex',
+                                gap: '4px'
+                              }}>
+                                <span>💡</span>
+                                <span>{reason.action}</span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                  
                   <div style={{ display: 'flex', gap: '8px' }}>
                     <button 
                       onClick={() => handleConfirmAppointment(apt.id, apt.patient_name)}

@@ -136,15 +136,134 @@ async def model_info():
 @app.post("/predict/no-show")
 async def predict_no_show():
     """
-    MVP endpoint: Returns a mock no-show risk score
+    MVP endpoint: Returns a mock no-show risk score with explainable reasons
     This is a simplified endpoint for the MVP phase.
     In V2, this will run a real model with patient data.
     
     Returns:
-        dict: Contains no_show_risk (0.1-0.95)
+        dict: Contains no_show_risk (0.1-0.95) and risk_reasons array
     """
     # For MVP, return a random risk score
     mock_risk = round(random.uniform(0.1, 0.95), 2)
-    logger.info(f"Mock prediction generated: no_show_risk={mock_risk}")
-    return {"no_show_risk": mock_risk}
+    
+    # Generate realistic fake reasons based on risk level
+    risk_reasons = generate_fake_xai_reasons(mock_risk)
+    
+    logger.info(f"Mock prediction generated: no_show_risk={mock_risk}, reasons={len(risk_reasons)}")
+    
+    return {
+        "no_show_risk": mock_risk,
+        "risk_reasons": risk_reasons
+    }
+
+
+def generate_fake_xai_reasons(risk_score: float) -> list:
+    """
+    Generate realistic fake XAI reasons based on risk score
+    This simulates what a real model would return
+    
+    Args:
+        risk_score: Risk score between 0 and 1
+    
+    Returns:
+        List of reason dictionaries with reason, weight, icon, and action
+    """
+    reasons = []
+    
+    # Pool of possible reasons (realistic scenarios)
+    high_risk_reasons = [
+        {
+            "reason": "3 previous no-shows in last 6 months",
+            "weight": "high",
+            "icon": "🚨",
+            "action": "Mention past no-shows during confirmation call"
+        },
+        {
+            "reason": "2 previous no-shows in last 3 months",
+            "weight": "high",
+            "icon": "🚨",
+            "action": "Follow up with multiple reminders"
+        },
+        {
+            "reason": "Patient has missed last 2 consecutive appointments",
+            "weight": "high",
+            "icon": "🚨",
+            "action": "Request deposit or reschedule to more convenient time"
+        }
+    ]
+    
+    medium_risk_reasons = [
+        {
+            "reason": "Appointment booked less than 24 hours in advance",
+            "weight": "medium",
+            "icon": "⏰",
+            "action": "Call patient within 2 hours to confirm"
+        },
+        {
+            "reason": "Appointment scheduled for late afternoon (after 4 PM)",
+            "weight": "medium",
+            "icon": "🕐",
+            "action": "Send reminder SMS morning of appointment"
+        },
+        {
+            "reason": "Patient age 22 (young adult demographic)",
+            "weight": "medium",
+            "icon": "👤",
+            "action": "Use SMS/text reminders in addition to calls"
+        },
+        {
+            "reason": "Appointment on Monday (historically higher no-show day)",
+            "weight": "medium",
+            "icon": "📅",
+            "action": "Send reminder day before appointment"
+        },
+        {
+            "reason": "New patient (no appointment history)",
+            "weight": "medium",
+            "icon": "🆕",
+            "action": "Make welcome call to build relationship"
+        },
+        {
+            "reason": "Patient has cancelled 2 appointments in past",
+            "weight": "medium",
+            "icon": "⚠️",
+            "action": "Confirm appointment flexibility and timing"
+        }
+    ]
+    
+    low_risk_reasons = [
+        {
+            "reason": "Routine check-up appointment (less urgent)",
+            "weight": "low",
+            "icon": "📋",
+            "action": "Standard reminder protocol"
+        },
+        {
+            "reason": "Appointment booked 2 weeks in advance",
+            "weight": "low",
+            "icon": "📆",
+            "action": "Single reminder 24 hours before"
+        },
+        {
+            "reason": "Patient travels 25+ minutes to clinic",
+            "weight": "low",
+            "icon": "🚗",
+            "action": "Confirm transportation arrangements"
+        }
+    ]
+    
+    # Select reasons based on risk score
+    if risk_score > 0.7:
+        # High risk: 1 high + 1-2 medium reasons
+        reasons.append(random.choice(high_risk_reasons))
+        reasons.extend(random.sample(medium_risk_reasons, random.randint(1, 2)))
+    elif risk_score > 0.4:
+        # Medium risk: 2-3 medium reasons
+        reasons.extend(random.sample(medium_risk_reasons, random.randint(2, 3)))
+    else:
+        # Low risk: 1-2 low/medium reasons
+        pool = medium_risk_reasons + low_risk_reasons
+        reasons.extend(random.sample(pool, random.randint(1, 2)))
+    
+    return reasons
 
